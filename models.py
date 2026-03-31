@@ -132,25 +132,23 @@ class StudyObservation(BaseModel):
 # ─────────────────────────────────────────────────────────────
 
 class RewardBreakdown(BaseModel):
-    """
-    Fine-grained reward signal. Returned in StepResult.info
-    so Person B can debug why the agent got a certain score.
-    """
     total: float = Field(0.0, ge=0.0, le=1.0)
 
     # Positive signals (each 0.0–1.0)
-    topic_match:      float = 0.0   # right weak topic targeted
-    difficulty_match: float = 0.0   # appropriate difficulty for score
-    slot_valid:       float = 0.0   # slot exists and not overloaded
-    pacing_score:     float = 0.0   # on track to cover all topics before exam
+    topic_match:      float = 0.0
+    difficulty_match: float = 0.0
+    slot_valid:       float = 0.0
+    pacing_score:     float = 0.0
+
+    # Bonuses
+    personality_bonus:       float = 0.0
 
     # Penalties (subtracted, each 0.0–1.0)
-    overload_penalty:    float = 0.0  # too many tasks in one slot
-    past_exam_penalty:   float = 0.0  # scheduled after exam date
-    repetition_penalty:  float = 0.0  # same topic recommended twice in a row
-    mastered_penalty:    float = 0.0  # recommended already mastered topic
-
-
+    overload_penalty:        float = 0.0
+    past_exam_penalty:       float = 0.0
+    repetition_penalty:      float = 0.0
+    mastered_penalty:        float = 0.0
+    retention_decay_penalty: float = 0.0
 # ─────────────────────────────────────────────────────────────
 # Step result — what step() returns
 # ─────────────────────────────────────────────────────────────

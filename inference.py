@@ -219,7 +219,7 @@ def run_task(task_id: str) -> float:
 
     episode_rewards = []
 
-    while not obs.get("done", False):
+    while not obs.get("done", False) and obs.get("available_slots"):
         step_num = obs["step"] + 1
         print(f"\n  Step {step_num}/{obs['max_steps']}")
 
