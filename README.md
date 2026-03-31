@@ -277,8 +277,8 @@ Evaluated using `meta-llama/Llama-3.3-70B-Instruct` via HuggingFace Inference Ro
 
 | Name | Role | GitHub |
 |---|---|---|
-| Dhanishka | Agent & Infra (Person B) | https://github.com/Dhanishkaa-1801 |
-| Ilamadhi J | Environment (Person A) | https://github.com/finac-ilamadhi |
+| Dhanishkaa D | Agent & Infra  | https://github.com/Dhanishkaa-1801 |
+| Ilamadhi J | Environment | https://github.com/finac-ilamadhi |
 
 HuggingFace Space: (https://huggingface.co/spaces/dhani1801/study-partner-env)
 
