@@ -432,31 +432,31 @@ class StudyEnv:
         if self._history and self._history[-1] == topic:
             bd.repetition_penalty = -0.1
 
-        # ── Personality bonus ────────────────────────────────────────────
+        # ── Personality bonus (not a RewardBreakdown field — tracked separately) ──
         # +0.1 if action fits personality
+        personality_bonus = 0.0
         if self._personality == Personality.PROCRASTINATOR and action.urgency == Urgency.TODAY:
-            bd.personality_bonus = 0.1
+            personality_bonus = 0.1
         elif self._personality == Personality.ANXIOUS and action.resource_type in (ResourceType.NOTES, ResourceType.VIDEO):
-            bd.personality_bonus = 0.1
+            personality_bonus = 0.1
         elif self._personality == Personality.CONSISTENT and action.urgency == Urgency.THIS_WEEK:
-            bd.personality_bonus = 0.1
+            personality_bonus = 0.1
 
-        # ── Forgetting curve penalty ─────────────────────────────────────
+        # ── Forgetting curve penalty (not a RewardBreakdown field — tracked separately) ──
         retention = self._retention_scores.get(topic, 1.0)
-        if retention < 0.5:
-            bd.retention_decay_penalty = -0.1
+        retention_penalty = -0.1 if retention < 0.5 else 0.0
 
-        # Compute total via manual sum (matches RewardBreakdown fields)
+        # Compute total using only fields that exist in teammate's RewardBreakdown
         raw = (
             bd.topic_match
             + bd.difficulty_match
             + bd.slot_valid
             + bd.pacing_score
-            + bd.personality_bonus
             + bd.mastered_penalty
             + bd.overload_penalty
             + bd.repetition_penalty
-            + bd.retention_decay_penalty
+            + personality_bonus
+            + retention_penalty
         )
         bd.total = round(max(0.0, min(1.0, raw)), 4)
         return bd
@@ -524,12 +524,11 @@ class StudyEnv:
         if bd.slot_valid > 0:
             parts.append(f"✅ Slot '{action.assigned_slot}' is valid")
         if bd.overload_penalty < 0:
-            parts.append(f"⚠️ Day overloaded — too many sessions")
+            parts.append("⚠️ Day overloaded — too many sessions")
         if bd.repetition_penalty < 0:
             parts.append("⚠️ Same topic recommended twice in a row")
-        if bd.personality_bonus > 0:
-            parts.append(f"✅ Action fits {self._personality.value} personality")
-        if bd.retention_decay_penalty < 0:
+        retention = self._retention_scores.get(action.recommended_topic, 1.0)
+        if retention < 0.5:
             parts.append(f"⚠️ '{action.recommended_topic}' retention is low — good to revise")
         parts.append(f"Reward: {bd.total:.3f}")
         return parts
