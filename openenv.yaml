@@ -1,0 +1,146 @@
+name: adaptive-study-partner
+version: "1.0.0"
+description: >
+  An RL environment where an agent acts as a personal study partner.
+  It recommends problems, schedules sessions, and adapts plans based
+  on student learning personality, topic retention decay, and
+  real-time disruptions — all optimized toward exam readiness.
+
+author: your-team-name
+tags:
+  - openenv
+  - education
+  - scheduling
+  - personalization
+  - edtech
+
+observation_space:
+  type: object
+  description: >
+    Full student state including weak topics, scores, retention decay,
+    available calendar slots, exam date, personality type, and any
+    active mid-episode disruption.
+  fields:
+    - name: task_id
+      type: string
+      description: Which task is currently active
+    - name: step
+      type: integer
+      description: Current step number within the episode
+    - name: max_steps
+      type: integer
+      description: Maximum steps allowed in this episode
+    - name: done
+      type: boolean
+      description: Whether the episode has ended
+    - name: student_id
+      type: string
+    - name: personality
+      type: string
+      enum: [procrastinator, consistent, anxious]
+    - name: weak_topics
+      type: array
+      items: string
+      description: Topics where score is below 0.6
+    - name: topic_scores
+      type: object
+      description: Map of topic name to mastery score 0.0-1.0
+    - name: retention_scores
+      type: object
+      description: Map of topic to decayed retention score 0.0-1.0
+    - name: available_slots
+      type: array
+      items: string
+      description: Valid time slots agent can assign study to
+    - name: exam_date
+      type: string
+      description: ISO date string for the exam
+    - name: days_remaining
+      type: integer
+    - name: last_action_feedback
+      type: string
+      description: Human-readable feedback from previous step
+    - name: last_reward
+      type: number
+    - name: disruption
+      type: object
+      nullable: true
+      description: Mid-episode disruption event if one occurred
+
+action_space:
+  type: object
+  description: >
+    Study recommendation — what topic to study, which slot to use,
+    what type of resource, and how urgently.
+  fields:
+    - name: recommended_topic
+      type: string
+      description: Must be a value from observation.weak_topics
+    - name: assigned_slot
+      type: string
+      description: Must be a value from observation.available_slots
+    - name: resource_type
+      type: string
+      enum: [problem, video, notes, mock_test]
+    - name: urgency
+      type: string
+      enum: [today, this_week, optional]
+
+tasks:
+  - id: task_1
+    name: Single Topic Recommendation
+    difficulty: easy
+    max_steps: 5
+    pass_threshold: 0.6
+    description: >
+      Student has 1 weak topic (Arrays, score 0.3), 3 days to exam,
+      and 4 available slots. Agent must recommend the right topic
+      at the right difficulty and assign it to a valid slot.
+      Tests basic topic targeting and slot assignment.
+
+  - id: task_2
+    name: Weekly Study Plan
+    difficulty: medium
+    max_steps: 10
+    pass_threshold: 0.5
+    description: >
+      Student has 4 weak topics, 7 days, 8 available slots, and a
+      procrastinator personality. Agent must cover all weak topics
+      with correct difficulty progression, no slot overloading,
+      and handle one mid-episode disruption (missed session).
+
+  - id: task_3
+    name: Exam Crunch Triage
+    difficulty: hard
+    max_steps: 15
+    pass_threshold: 0.4
+    description: >
+      Student has 8 topics (3 critical), only 3 days remaining,
+      several blocked slots, anxious personality, topics with low
+      retention from days without revision, and a mock test added
+      mid-episode. Agent must prioritize ruthlessly, protect
+      critical topics, and build a feasible compressed schedule.
+
+reward_range: [0.0, 1.0]
+reward_description: >
+  Partial reward at every step. Components: topic_match (0.4 weight),
+  difficulty_match (0.3), slot_valid (0.2), pacing_score (0.1).
+  Penalties for: overloading a slot, scheduling past exam date,
+  repeating same topic consecutively, recommending mastered topics.
+
+episode_timeout: 30
+
+docker:
+  image: study-partner-env
+  port: 8000
+  build_cmd: docker build -t study-partner-env .
+  run_cmd: docker run -p 8000:8000 study-partner-env
+
+huggingface:
+  space: your-username/study-partner-env
+  sdk: docker
+
+baseline_scores:
+  task_1: 0.0
+  task_2: 0.0
+  task_3: 0.0
