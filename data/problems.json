@@ -1,0 +1,207 @@
+{
+  "problems": [
+    {
+      "id": "p001",
+      "topic": "Arrays",
+      "difficulty": "easy",
+      "estimated_minutes": 15,
+      "description": "Find the maximum element in an unsorted array."
+    },
+    {
+      "id": "p002",
+      "topic": "Arrays",
+      "difficulty": "easy",
+      "estimated_minutes": 20,
+      "description": "Reverse an array in-place without extra space."
+    },
+    {
+      "id": "p003",
+      "topic": "Arrays",
+      "difficulty": "medium",
+      "estimated_minutes": 30,
+      "description": "Find all pairs in an array that sum to a target value."
+    },
+    {
+      "id": "p004",
+      "topic": "Arrays",
+      "difficulty": "hard",
+      "estimated_minutes": 45,
+      "description": "Given an array of stock prices, find the max profit with at most K transactions."
+    },
+
+    {
+      "id": "p005",
+      "topic": "Linked Lists",
+      "difficulty": "easy",
+      "estimated_minutes": 15,
+      "description": "Traverse a singly linked list and print all node values."
+    },
+    {
+      "id": "p006",
+      "topic": "Linked Lists",
+      "difficulty": "medium",
+      "estimated_minutes": 25,
+      "description": "Detect a cycle in a linked list using Floyd's algorithm."
+    },
+    {
+      "id": "p007",
+      "topic": "Linked Lists",
+      "difficulty": "hard",
+      "estimated_minutes": 40,
+      "description": "Reverse a linked list in groups of K nodes."
+    },
+
+    {
+      "id": "p008",
+      "topic": "Trees",
+      "difficulty": "easy",
+      "estimated_minutes": 20,
+      "description": "Find the height of a binary tree using recursion."
+    },
+    {
+      "id": "p009",
+      "topic": "Trees",
+      "difficulty": "easy",
+      "estimated_minutes": 20,
+      "description": "Perform an inorder traversal of a binary tree iteratively."
+    },
+    {
+      "id": "p010",
+      "topic": "Trees",
+      "difficulty": "medium",
+      "estimated_minutes": 35,
+      "description": "Find the lowest common ancestor of two nodes in a binary tree."
+    },
+    {
+      "id": "p011",
+      "topic": "Trees",
+      "difficulty": "hard",
+      "estimated_minutes": 50,
+      "description": "Serialize and deserialize a binary tree."
+    },
+
+    {
+      "id": "p012",
+      "topic": "Dynamic Programming",
+      "difficulty": "easy",
+      "estimated_minutes": 20,
+      "description": "Compute the nth Fibonacci number using memoization."
+    },
+    {
+      "id": "p013",
+      "topic": "Dynamic Programming",
+      "difficulty": "medium",
+      "estimated_minutes": 40,
+      "description": "Solve the 0/1 knapsack problem for a given weight capacity."
+    },
+    {
+      "id": "p014",
+      "topic": "Dynamic Programming",
+      "difficulty": "medium",
+      "estimated_minutes": 35,
+      "description": "Find the length of the longest common subsequence of two strings."
+    },
+    {
+      "id": "p015",
+      "topic": "Dynamic Programming",
+      "difficulty": "hard",
+      "estimated_minutes": 55,
+      "description": "Find the minimum cost to cut a rod into pieces of given lengths."
+    },
+
+    {
+      "id": "p016",
+      "topic": "Graphs",
+      "difficulty": "easy",
+      "estimated_minutes": 20,
+      "description": "Implement BFS on an undirected graph and print traversal order."
+    },
+    {
+      "id": "p017",
+      "topic": "Graphs",
+      "difficulty": "medium",
+      "estimated_minutes": 35,
+      "description": "Detect a cycle in a directed graph using DFS."
+    },
+    {
+      "id": "p018",
+      "topic": "Graphs",
+      "difficulty": "medium",
+      "estimated_minutes": 40,
+      "description": "Find the shortest path between two nodes using Dijkstra's algorithm."
+    },
+    {
+      "id": "p019",
+      "topic": "Graphs",
+      "difficulty": "hard",
+      "estimated_minutes": 60,
+      "description": "Find all strongly connected components using Kosaraju's algorithm."
+    },
+
+    {
+      "id": "p020",
+      "topic": "OS",
+      "difficulty": "easy",
+      "estimated_minutes": 15,
+      "description": "Explain the difference between a process and a thread with examples."
+    },
+    {
+      "id": "p021",
+      "topic": "OS",
+      "difficulty": "medium",
+      "estimated_minutes": 30,
+      "description": "Simulate the Round Robin CPU scheduling algorithm for a given process set."
+    },
+    {
+      "id": "p022",
+      "topic": "OS",
+      "difficulty": "hard",
+      "estimated_minutes": 45,
+      "description": "Solve a deadlock detection problem using the Banker's algorithm."
+    },
+
+    {
+      "id": "p023",
+      "topic": "DBMS",
+      "difficulty": "easy",
+      "estimated_minutes": 15,
+      "description": "Write a SQL query to find the second highest salary in an employee table."
+    },
+    {
+      "id": "p024",
+      "topic": "DBMS",
+      "difficulty": "medium",
+      "estimated_minutes": 30,
+      "description": "Normalize a given unnormalized table to 3NF step by step."
+    },
+    {
+      "id": "p025",
+      "topic": "DBMS",
+      "difficulty": "hard",
+      "estimated_minutes": 45,
+      "description": "Design a schema for an e-commerce platform and write 5 complex JOIN queries."
+    },
+
+    {
+      "id": "p026",
+      "topic": "System Design",
+      "difficulty": "easy",
+      "estimated_minutes": 20,
+      "description": "Design a URL shortener — explain components, data flow, and storage."
+    },
+    {
+      "id": "p027",
+      "topic": "System Design",
+      "difficulty": "medium",
+      "estimated_minutes": 45,
+      "description": "Design a rate limiter for a public API with 1M requests/day."
+    },
+    {
+      "id": "p028",
+      "topic": "System Design",
+      "difficulty": "hard",
+      "estimated_minutes": 60,
+      "description": "Design a distributed notification system (like WhatsApp push notifications)."
+    }
+  ]
+}

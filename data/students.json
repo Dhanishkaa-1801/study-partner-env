@@ -1,0 +1,79 @@
+{
+  "students": [
+    {
+      "student_id": "s001",
+      "name": "abc",
+      "personality": "procrastinator",
+      "topic_scores": {
+        "Arrays": 0.3,
+        "Linked Lists": 0.5,
+        "Trees": 0.2,
+        "Dynamic Programming": 0.1,
+        "Graphs": 0.4,
+        "OS": 0.6,
+        "DBMS": 0.7,
+        "System Design": 0.2
+      },
+      "available_slots": [
+        "Mon 9am", "Mon 2pm",
+        "Tue 9am", "Tue 6pm",
+        "Wed 11am", "Wed 4pm",
+        "Thu 9am", "Thu 2pm",
+        "Fri 10am"
+      ],
+      "exam_date": "2024-03-22",
+      "days_remaining": 7,
+      "notes": "Tends to delay hard topics. Needs urgency signals to act. Used in Task 2 (medium)."
+    },
+    {
+      "student_id": "s002",
+      "name": "xyz",
+      "personality": "anxious",
+      "topic_scores": {
+        "Arrays": 0.8,
+        "Linked Lists": 0.7,
+        "Trees": 0.3,
+        "Dynamic Programming": 0.2,
+        "Graphs": 0.2,
+        "OS": 0.5,
+        "DBMS": 0.6,
+        "System Design": 0.1
+      },
+      "available_slots": [
+        "Mon 10am",
+        "Tue 10am",
+        "Wed 10am",
+        "Thu 10am"
+      ],
+      "exam_date": "2024-03-20",
+      "days_remaining": 3,
+      "notes": "High anxiety. Needs confidence-building before hard topics. Used in Task 1 (easy) — only Trees is the focus."
+    },
+    {
+      "student_id": "s003",
+      "name": "pqr",
+      "personality": "consistent",
+      "topic_scores": {
+        "Arrays": 0.9,
+        "Linked Lists": 0.8,
+        "Trees": 0.5,
+        "Dynamic Programming": 0.3,
+        "Graphs": 0.3,
+        "OS": 0.4,
+        "DBMS": 0.5,
+        "System Design": 0.2
+      },
+      "available_slots": [
+        "Mon 9am",  "Mon 3pm",
+        "Tue 9am",  "Tue 3pm",
+        "Wed 9am",  "Wed 3pm",
+        "Thu 9am",  "Thu 3pm",
+        "Fri 9am",  "Fri 3pm",
+        "Sat 10am", "Sat 2pm"
+      ],
+      "exam_date": "2024-03-28",
+      "days_remaining": 14,
+      "notes": "Reliable, steady pace. Can handle full triage. Used in Task 3 (hard) with disruptions and blocked slots."
+    }
+  ]
+}

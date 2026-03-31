@@ -1,0 +1,221 @@
+{
+  "resources": [
+    {
+      "topic": "Arrays",
+      "title": "GFG Arrays Data Structure Guide",
+      "url": "https://www.geeksforgeeks.org/array-data-structure/",
+      "resource_type": "notes",
+      "estimated_minutes": 20
+    },
+    {
+      "topic": "Arrays",
+      "title": "Striver's Array Series — Take U Forward",
+      "url": "https://takeuforward.org/interviews/strivers-sde-sheet-top-coding-interview-problems/",
+      "resource_type": "problem",
+      "estimated_minutes": 60
+    },
+    {
+      "topic": "Arrays",
+      "title": "Arrays Crash Course — Neetcode",
+      "url": "https://neetcode.io/roadmap",
+      "resource_type": "video",
+      "estimated_minutes": 30
+    },
+    {
+      "topic": "Arrays",
+      "title": "LeetCode Arrays Problem Set",
+      "url": "https://leetcode.com/tag/array/",
+      "resource_type": "problem",
+      "estimated_minutes": 45
+    },
+
+    {
+      "topic": "Linked Lists",
+      "title": "GFG Linked List Complete Tutorial",
+      "url": "https://www.geeksforgeeks.org/data-structures/linked-list/",
+      "resource_type": "notes",
+      "estimated_minutes": 25
+    },
+    {
+      "topic": "Linked Lists",
+      "title": "Striver's Linked List Sheet",
+      "url": "https://takeuforward.org/linked-list/striver-s-linked-list-series/",
+      "resource_type": "problem",
+      "estimated_minutes": 60
+    },
+    {
+      "topic": "Linked Lists",
+      "title": "Linked List — Neetcode Roadmap",
+      "url": "https://neetcode.io/roadmap",
+      "resource_type": "video",
+      "estimated_minutes": 25
+    },
+
+    {
+      "topic": "Trees",
+      "title": "GFG Binary Tree Complete Guide",
+      "url": "https://www.geeksforgeeks.org/binary-tree-data-structure/",
+      "resource_type": "notes",
+      "estimated_minutes": 30
+    },
+    {
+      "topic": "Trees",
+      "title": "Striver's Tree Series — Take U Forward",
+      "url": "https://takeuforward.org/tree/striver-s-tree-series/",
+      "resource_type": "video",
+      "estimated_minutes": 90
+    },
+    {
+      "topic": "Trees",
+      "title": "LeetCode Trees Problem Set",
+      "url": "https://leetcode.com/tag/tree/",
+      "resource_type": "problem",
+      "estimated_minutes": 45
+    },
+    {
+      "topic": "Trees",
+      "title": "Binary Search Tree Visualizer",
+      "url": "https://visualgo.net/en/bst",
+      "resource_type": "notes",
+      "estimated_minutes": 15
+    },
+
+    {
+      "topic": "Dynamic Programming",
+      "title": "Striver's DP Series — Take U Forward",
+      "url": "https://takeuforward.org/dynamic-programming/striver-s-dp-series-dynamic-programming/",
+      "resource_type": "video",
+      "estimated_minutes": 120
+    },
+    {
+      "topic": "Dynamic Programming",
+      "title": "GFG Dynamic Programming Tutorial",
+      "url": "https://www.geeksforgeeks.org/dynamic-programming/",
+      "resource_type": "notes",
+      "estimated_minutes": 40
+    },
+    {
+      "topic": "Dynamic Programming",
+      "title": "LeetCode DP Problem Set",
+      "url": "https://leetcode.com/tag/dynamic-programming/",
+      "resource_type": "problem",
+      "estimated_minutes": 60
+    },
+    {
+      "topic": "Dynamic Programming",
+      "title": "Neetcode DP Patterns Playlist",
+      "url": "https://neetcode.io/roadmap",
+      "resource_type": "video",
+      "estimated_minutes": 45
+    },
+
+    {
+      "topic": "Graphs",
+      "title": "Striver's Graph Series — Take U Forward",
+      "url": "https://takeuforward.org/graph/striver-s-graph-series/",
+      "resource_type": "video",
+      "estimated_minutes": 120
+    },
+    {
+      "topic": "Graphs",
+      "title": "GFG Graph Data Structure Guide",
+      "url": "https://www.geeksforgeeks.org/graph-data-structure-and-algorithms/",
+      "resource_type": "notes",
+      "estimated_minutes": 35
+    },
+    {
+      "topic": "Graphs",
+      "title": "LeetCode Graphs Problem Set",
+      "url": "https://leetcode.com/tag/graph/",
+      "resource_type": "problem",
+      "estimated_minutes": 60
+    },
+    {
+      "topic": "Graphs",
+      "title": "Graph Algorithm Visualizer",
+      "url": "https://visualgo.net/en/graphds",
+      "resource_type": "notes",
+      "estimated_minutes": 15
+    },
+
+    {
+      "topic": "OS",
+      "title": "GFG Operating Systems Full Notes",
+      "url": "https://www.geeksforgeeks.org/operating-systems/",
+      "resource_type": "notes",
+      "estimated_minutes": 60
+    },
+    {
+      "topic": "OS",
+      "title": "Gate Smashers OS Playlist — YouTube",
+      "url": "https://www.youtube.com/playlist?list=PLxCzCOWd7aiGz9donHRrE9I3Mwn6XdP8p",
+      "resource_type": "video",
+      "estimated_minutes": 90
+    },
+    {
+      "topic": "OS",
+      "title": "InterviewBit OS Interview Questions",
+      "url": "https://www.interviewbit.com/operating-system-interview-questions/",
+      "resource_type": "mock_test",
+      "estimated_minutes": 30
+    },
+
+    {
+      "topic": "DBMS",
+      "title": "GFG DBMS Complete Tutorial",
+      "url": "https://www.geeksforgeeks.org/dbms/",
+      "resource_type": "notes",
+      "estimated_minutes": 50
+    },
+    {
+      "topic": "DBMS",
+      "title": "Gate Smashers DBMS Playlist — YouTube",
+      "url": "https://www.youtube.com/playlist?list=PLxCzCOWd7aiFAN6I8CuViBuCdJgiOkT2Y",
+      "resource_type": "video",
+      "estimated_minutes": 90
+    },
+    {
+      "topic": "DBMS",
+      "title": "LeetCode SQL Problem Set",
+      "url": "https://leetcode.com/problemset/database/",
+      "resource_type": "problem",
+      "estimated_minutes": 40
+    },
+    {
+      "topic": "DBMS",
+      "title": "InterviewBit DBMS Interview Questions",
+      "url": "https://www.interviewbit.com/dbms-interview-questions/",
+      "resource_type": "mock_test",
+      "estimated_minutes": 30
+    },
+
+    {
+      "topic": "System Design",
+      "title": "System Design Primer — GitHub",
+      "url": "https://github.com/donnemartin/system-design-primer",
+      "resource_type": "notes",
+      "estimated_minutes": 90
+    },
+    {
+      "topic": "System Design",
+      "title": "Gaurav Sen System Design Playlist — YouTube",
+      "url": "https://www.youtube.com/playlist?list=PLMCXHnjXnTnvo6alSjVkgxV-VH6EPyvoX",
+      "resource_type": "video",
+      "estimated_minutes": 120
+    },
+    {
+      "topic": "System Design",
+      "title": "Exponent System Design Mock Interview",
+      "url": "https://www.tryexponent.com/courses/system-design-interview",
+      "resource_type": "mock_test",
+      "estimated_minutes": 60
+    },
+    {
+      "topic": "System Design",
+      "title": "High Scalability Blog",
+      "url": "http://highscalability.com/",
+      "resource_type": "notes",
+      "estimated_minutes": 30
+    }
+  ]
+}
