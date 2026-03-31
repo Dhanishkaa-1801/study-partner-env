@@ -132,15 +132,15 @@ episode_timeout: 30
 
 docker:
   image: study-partner-env
-  port: 8000
+  port: 7860
   build_cmd: docker build -t study-partner-env .
-  run_cmd: docker run -p 8000:8000 study-partner-env
+  run_cmd: docker run -p 7860:7860 study-partner-env
 
 huggingface:
   space: your-username/study-partner-env
   sdk: docker
 
 baseline_scores:
-  task_1: 0.0
-  task_2: 0.0
-  task_3: 0.0
+  task_1: 0.8333
+  task_2: 0.8857
+  task_3: 0.9167
