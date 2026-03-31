@@ -1,3 +1,8 @@
+**This project was developed for the Build at the Bleeding Edge of AI [Scaler x Meta x HuggingFace x PyTorch OpenEnv Hackathon 2026]**
+
+## 🎯 Hackathon Objective
+The goal of this submission is to demonstrate a high-fidelity **Reinforcement Learning (RL) Environment** using the `OpenEnv` framework. Our environment simulates a complex, human-centric challenge: **Personalized Educational Planning.**
+
 # 📚 Adaptive Study Partner — OpenEnv Environment
 
 > An RL environment where an agent acts as a personal study partner —
@@ -272,10 +277,10 @@ Evaluated using `meta-llama/Llama-3.3-70B-Instruct` via HuggingFace Inference Ro
 
 | Name | Role | GitHub |
 |---|---|---|
-| YOUR_NAME | Environment (Person A) | @YOUR_GITHUB |
-| TEAMMATE_NAME | Agent & Infra (Person B) | @TEAMMATE_GITHUB |
+| Dhanishka | Agent & Infra (Person B) | https://github.com/Dhanishkaa-1801 |
+| Ilamadhi J | Environment (Person A) | https://github.com/finac-ilamadhi |
 
-HuggingFace Space: [YOUR_USERNAME/study-partner-env](https://huggingface.co/spaces/YOUR_USERNAME/study-partner-env)
+HuggingFace Space: (https://huggingface.co/spaces/dhani1801/study-partner-env)
 
 ---
 
