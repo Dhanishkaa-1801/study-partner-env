@@ -1,3 +1,16 @@
+<<<<<<< HEAD
+---
+title: Adaptive Study Partner
+emoji: 🤖
+colorFrom: blue
+colorTo: green
+sdk: docker
+app_file: app.py
+pinned: false
+---
+
+#triggering
+
 **This project was developed for the Build at the Bleeding Edge of AI [Scaler x Meta x HuggingFace x PyTorch OpenEnv Hackathon 2026]**
 
 ## 🎯 Hackathon Objective
@@ -296,3 +309,15 @@ HuggingFace Space: (https://huggingface.co/spaces/dhani1801/study-partner-env)
 
 
 
+=======
+---
+title: Study Partner Env
+emoji: 🦀
+colorFrom: blue
+colorTo: green
+sdk: docker
+pinned: false
+---
+
+Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
+>>>>>>> 41162b46b5a8dba6ad063ab447498a4ec47a5613
