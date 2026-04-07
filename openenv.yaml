@@ -140,6 +140,11 @@ huggingface:
   space: dhani-1801/study-partner-env
   sdk: docker
 
+entrypoint: server.app:app
+
+runtime:
+  type: docker
+
 baseline_scores:
   task_1: 0.8667
   task_2: 0.8
