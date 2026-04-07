@@ -3,6 +3,8 @@
 ## 🎯 Hackathon Objective
 The goal of this submission is to demonstrate a high-fidelity **Reinforcement Learning (RL) Environment** using the `OpenEnv` framework. Our environment simulates a complex, human-centric challenge: **Personalized Educational Planning.**
 
+> Designed for real-world adaptive learning systems and LLM-based planning agents.
+
 # 📚 Adaptive Study Partner — OpenEnv Environment
 
 > An RL environment where an agent acts as a personal study partner —
@@ -192,7 +194,7 @@ its next action accordingly.
 study-partner-env/
 ├── environment.py      ← StudyEnv: reset(), step(), state(), grade()
 ├── models.py           ← Shared Pydantic contract (observation, action, reward)
-├── app.py              ← FastAPI wrapper (OpenEnv API endpoints)
+├── server/app.py       ← FastAPI wrapper (OpenEnv endpoints)
 ├── inference.py        ← Baseline LLM agent
 ├── tasks/
 │   ├── task_1.py       ← Easy grader
@@ -222,7 +224,7 @@ cd study-partner-env
 pip install -r requirements.txt
 
 # Start the environment server
-uvicorn app:app --host 0.0.0.0 --port 8000
+uvicorn server.app:app --host 0.0.0.0 --port 8000
 ```
 
 ### Run with Docker
@@ -231,19 +233,19 @@ uvicorn app:app --host 0.0.0.0 --port 8000
 docker build -t study-partner-env .
 
 docker run -p 8000:8000 \
-  -e API_BASE_URL=https://router.huggingface.co/v1 \
-  -e MODEL_NAME=meta-llama/Llama-3.3-70B-Instruct \
-  -e HF_TOKEN=your_token_here \
+  -e API_BASE_URL=https://api.groq.com/openai/v1 \
+  -e MODEL_NAME=llama-3.1-8b-instant \
+  -e GROQ_API_KEY=your_token_here \
   study-partner-env
 ```
 
 ### Run the Baseline Agent
 
 ```bash
-export API_BASE_URL=https://router.huggingface.co/v1
-export MODEL_NAME=meta-llama/Llama-3.3-70B-Instruct
-export HF_TOKEN=your_hf_token
-export ENV_URL=http://localhost:8000
+export API_BASE_URL=https://api.groq.com/openai/v1
+export MODEL_NAME=llama-3.1-8b-instant
+export GROQ_API_KEY=your_api_key
+export ENV_URL=https://dhani1801-study-partner-env.hf.space
 
 python inference.py
 ```
@@ -262,7 +264,10 @@ python inference.py
 
 ## 📊 Baseline Scores
 
-Evaluated using `meta-llama/Llama-3.3-70B-Instruct` via HuggingFace Inference Router:
+Evaluated using `llama-3.1-8b-instant` via Groq (Compatible API)
+
+> The agent is provider-agnostic and supports any OpenAI-compatible API 
+> (e.g., HuggingFace Router, Groq) via environment variables.
 
 | Task | Difficulty | Score | Passed |
 |---|---|---|---|
