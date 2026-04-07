@@ -1,6 +1,36 @@
-venv/
+# Python
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+.env/
+.venv/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Environment variables
 .env
+.env.*
+
+# Python packaging caches
+pip-wheel-metadata/
 *.egg-info/
-dist/
+
+# Test/cache
+.pytest_cache/
+
+# Docker (optional but safe)
+*.tar
+
+# WSL / temp
+*.swp

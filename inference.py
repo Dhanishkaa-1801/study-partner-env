@@ -5,10 +5,10 @@ Usage:
     python inference.py
 
 Required environment variables:
-    API_BASE_URL   LLM endpoint  e.g. https://router.huggingface.co/v1
-    MODEL_NAME     Model id      e.g. meta-llama/Llama-3.3-70B-Instruct
-    HF_TOKEN       HF API key
-    ENV_URL        Environment server (default: http://localhost:8000)
+    API_BASE_URL   LLM endpoint  e.g. https://api.groq.com/openai/v1
+    MODEL_NAME     Model id      e.g. llama-3.1-8b-instant
+    ROQ_API_KEY       Your Hugging Face / API key
+    ENV_URL        Environment server (default: http://localhost:8000) or https://dhani1801-study-partner-env.hf.space
 """
 
 import os
@@ -25,20 +25,59 @@ load_dotenv()
 # Config
 # ─────────────────────────────────────────────
 
-API_BASE_URL = os.getenv("API_BASE_URL", "https://router.huggingface.co/v1")
-MODEL_NAME   = os.getenv("MODEL_NAME", "meta-llama/Llama-3.3-70B-Instruct")
-HF_TOKEN     = os.getenv("HF_TOKEN")
-ENV_URL      = os.getenv("ENV_URL", "http://localhost:8000")
+API_BASE_URL = os.getenv("API_BASE_URL", "https://api.groq.com/openai/v1")
+MODEL_NAME   = os.getenv("MODEL_NAME", "llama-3.1-8b-instant")
+ENV_URL      = os.getenv("ENV_URL", "https://dhani1801-study-partner-env.hf.space")
 
 TEMPERATURE  = 0.2
 MAX_TOKENS   = 300
 MAX_RETRIES  = 3
 
-if not HF_TOKEN:
-    print("ERROR: HF_TOKEN environment variable not set")
+HF_TOKEN   = os.getenv("HF_TOKEN")
+GROQ_TOKEN = os.getenv("GROQ_API_KEY")
+
+API_KEY = GROQ_TOKEN or HF_TOKEN
+
+if not API_KEY:
+    print("ERROR: No API key set (GROQ_API_KEY or HF_TOKEN)")
     sys.exit(1)
 
-client = OpenAI(base_url=API_BASE_URL, api_key=HF_TOKEN)
+client = OpenAI(base_url=API_BASE_URL, api_key=API_KEY)
+
+# ─────────────────────────────────────────────
+# Structured logging — mandatory format
+# ─────────────────────────────────────────────
+
+def log_start(task_id: str):
+    """Emit [START] log — once per task, before any steps."""
+    print(json.dumps({
+        "tag":      "[START]",
+        "task_id":  task_id,
+        "model":    MODEL_NAME,
+        "env_url":  ENV_URL,
+    }), flush=True)
+
+
+def log_step(step: int, action: dict, reward: float, done: bool):
+    """Emit [STEP] log — once per environment step."""
+    print(json.dumps({
+        "tag":    "[STEP]",
+        "step":   step,
+        "action": action,
+        "reward": round(reward, 4),
+        "done":   done,
+    }), flush=True)
+
+
+def log_end(task_id: str, score: float, total_steps: int):
+    """Emit [END] log — once per task, after episode finishes."""
+    print(json.dumps({
+        "tag":         "[END]",
+        "task_id":     task_id,
+        "score":       round(score, 4),
+        "total_steps": total_steps,
+    }), flush=True)
+
 
 # ─────────────────────────────────────────────
 # Prompts
@@ -59,12 +98,12 @@ Personality guidance:
 
 Resource guidance:
 - score < 0.3: Use "video" or "notes" to build foundation first
-- score 0.3–0.6: Use "problem" to reinforce understanding
+- score 0.3-0.6: Use "problem" to reinforce understanding
 - score > 0.6 but still weak: Use "mock_test" to solidify
 
 Urgency guidance:
 - days_remaining < 3: Almost everything is "today"
-- days_remaining 3–7: Mix "today" and "this_week"
+- days_remaining 3-7: Mix "today" and "this_week"
 - days_remaining > 7: Use "this_week" and "optional" strategically
 
 CRITICAL: You must respond with ONLY a valid JSON object. No explanation. No markdown. No extra text.
@@ -131,11 +170,9 @@ def get_agent_action(obs: dict) -> dict:
 
             # Validate values are legal
             if action["recommended_topic"] not in obs["weak_topics"]:
-                print(f"  [warn] LLM chose topic not in weak_topics, correcting...")
                 action["recommended_topic"] = obs["weak_topics"][0]
 
             if action["assigned_slot"] not in obs["available_slots"]:
-                print(f"  [warn] LLM chose invalid slot, correcting...")
                 action["assigned_slot"] = obs["available_slots"][0]
 
             if action["resource_type"] not in ("problem", "video", "notes", "mock_test"):
@@ -147,13 +184,11 @@ def get_agent_action(obs: dict) -> dict:
             return action
 
         except json.JSONDecodeError as e:
-            print(f"  [attempt {attempt+1}] JSON parse error: {e}")
             if attempt == MAX_RETRIES - 1:
                 return get_fallback_action(obs)
             time.sleep(1)
 
         except Exception as e:
-            print(f"  [attempt {attempt+1}] LLM error: {e}")
             if attempt == MAX_RETRIES - 1:
                 return get_fallback_action(obs)
             time.sleep(2)
@@ -163,24 +198,21 @@ def get_agent_action(obs: dict) -> dict:
 
 def get_fallback_action(obs: dict) -> dict:
     """Safe fallback if LLM fails — picks lowest score topic in first slot."""
-    weak = obs.get("weak_topics", [])
-    slots = obs.get("available_slots", [])
+    weak   = obs.get("weak_topics", [])
+    slots  = obs.get("available_slots", [])
     scores = obs.get("topic_scores", {})
 
-    # Pick the weakest topic
-    topic = min(weak, key=lambda t: scores.get(t, 0.0)) if weak else "Arrays"
-    slot  = slots[0] if slots else "Mon 9am"
-    score = scores.get(topic, 0.5)
-
+    topic    = min(weak, key=lambda t: scores.get(t, 0.0)) if weak else "Arrays"
+    slot     = slots[0] if slots else "Mon 9am"
+    score    = scores.get(topic, 0.5)
     resource = "video" if score < 0.3 else "problem"
     urgency  = "today" if obs.get("days_remaining", 7) < 3 else "this_week"
 
-    print(f"  [fallback] using: {topic} / {slot} / {resource} / {urgency}")
     return {
         "recommended_topic": topic,
-        "assigned_slot": slot,
-        "resource_type": resource,
-        "urgency": urgency,
+        "assigned_slot":     slot,
+        "resource_type":     resource,
+        "urgency":           urgency,
     }
 
 
@@ -199,50 +231,41 @@ def call_env(method: str, path: str, **kwargs) -> dict:
         r.raise_for_status()
         return r.json()
     except httpx.HTTPStatusError as e:
-        print(f"  [env error] {e.response.status_code}: {e.response.text}")
         raise
     except httpx.ConnectError:
-        print(f"  [env error] Cannot connect to {ENV_URL}. Is the server running?")
         raise
 
 
 def run_task(task_id: str) -> float:
     """Run one full episode for a task. Returns final score."""
-    print(f"\n{'='*55}")
-    print(f"  TASK: {task_id}")
-    print(f"{'='*55}")
 
+    # Reset environment and emit [START]
     obs = call_env("POST", f"/reset?task_id={task_id}")
-    print(f"  Student: {obs['student_id']} | Personality: {obs['personality']}")
-    print(f"  Weak topics: {obs['weak_topics']}")
-    print(f"  Days remaining: {obs['days_remaining']}")
+    log_start(task_id)
 
     episode_rewards = []
+    step_num        = 0
 
     while not obs.get("done", False) and obs.get("available_slots"):
-        step_num = obs["step"] + 1
-        print(f"\n  Step {step_num}/{obs['max_steps']}")
+        step_num += 1
 
         action = get_agent_action(obs)
-        print(f"  → {action['recommended_topic']} | {action['assigned_slot']} | {action['resource_type']} | {action['urgency']}")
-
         result = call_env("POST", "/step", json=action)
+
         obs    = result["observation"]
         reward = result["reward"]
-        info   = result.get("info", {})
+        done   = result.get("done", False)
 
         episode_rewards.append(reward)
-        print(f"  ← reward: {reward:.3f} | {obs.get('last_action_feedback', '')}")
 
-        breakdown = info.get("reward_breakdown", {})
-        if breakdown:
-            print(f"     topic={breakdown.get('topic_match', 0):.2f} "
-                  f"diff={breakdown.get('difficulty_match', 0):.2f} "
-                  f"slot={breakdown.get('slot_valid', 0):.2f} "
-                  f"pace={breakdown.get('pacing_score', 0):.2f}")
+        # Mandatory structured step log
+        log_step(step_num, action, reward, done)
 
     final_score = sum(episode_rewards) / len(episode_rewards) if episode_rewards else 0.0
-    print(f"\n  Final score: {final_score:.4f}")
+
+    # Mandatory structured end log
+    log_end(task_id, final_score, step_num)
+
     return final_score
 
 
@@ -251,17 +274,11 @@ def run_task(task_id: str) -> float:
 # ─────────────────────────────────────────────
 
 def main():
-    print(f"\nAdaptive Study Partner — Baseline Agent")
-    print(f"Model:  {MODEL_NAME}")
-    print(f"Server: {ENV_URL}")
-
     # Quick health check
     try:
-        health = call_env("GET", "/health")
-        print(f"Server: {health}")
+        call_env("GET", "/health")
     except Exception:
-        print("ERROR: Cannot reach environment server.")
-        print(f"Make sure it is running at {ENV_URL}")
+        print(json.dumps({"tag": "[ERROR]", "message": f"Cannot reach environment server at {ENV_URL}"}))
         sys.exit(1)
 
     scores = {}
@@ -269,19 +286,16 @@ def main():
         try:
             scores[task_id] = run_task(task_id)
         except Exception as e:
-            print(f"\nERROR running {task_id}: {e}")
+            log_end(task_id, 0.0, 0)
             scores[task_id] = 0.0
 
-    # Summary
-    print(f"\n{'='*55}")
-    print("  BASELINE SCORES")
-    print(f"{'='*55}")
-    for task_id, score in scores.items():
-        bar = "█" * int(score * 20) + "░" * (20 - int(score * 20))
-        print(f"  {task_id}: {score:.4f}  {bar}")
+    # Final summary (plain print is fine here — outside task scope)
     avg = sum(scores.values()) / len(scores)
-    print(f"\n  Average: {avg:.4f}")
-    print(f"{'='*55}")
+    print(json.dumps({
+        "tag":    "[SUMMARY]",
+        "scores": {k: round(v, 4) for k, v in scores.items()},
+        "avg":    round(avg, 4),
+    }), flush=True)
 
 
 if __name__ == "__main__":

@@ -1,7 +1,6 @@
 """
-models.py — shared contract between environment (Person A) and agent (Person B)
-BOTH people read this before writing anything else.
-DO NOT change field names without telling your teammate.
+models.py — shared contract between environment and (Person B)
+
 """
 
 from __future__ import annotations

@@ -14,7 +14,7 @@ COPY . .
 
 # Expose FastAPI port
 EXPOSE 7860
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "7860"]
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
 
 # Health check so HF Space knows it is alive
 HEALTHCHECK --interval=30s --timeout=10s --start-period=10s \

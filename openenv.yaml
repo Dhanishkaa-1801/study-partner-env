@@ -6,7 +6,7 @@ description: >
   on student learning personality, topic retention decay, and
   real-time disruptions — all optimized toward exam readiness.
 
-author: your-team-name
+author: tech-twins
 tags:
   - openenv
   - education
@@ -137,7 +137,7 @@ docker:
   run_cmd: docker run -p 7860:7860 study-partner-env
 
 huggingface:
-  space: your-username/study-partner-env
+  space: dhani-1801/study-partner-env
   sdk: docker
 
 baseline_scores:

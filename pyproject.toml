@@ -1,0 +1,18 @@
+[project]
+name = "adaptive-study-partner"
+version = "1.0.0"
+description = "Adaptive Study Partner RL Environment"
+authors = [{ name = "tech-twins" }]
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "pydantic",
+    "openenv-core>=0.2.0"
+]
+
+[project.scripts]
+server = "server.app:main"
+
+[tool.openenv]
+entrypoint = "server.app:main"
