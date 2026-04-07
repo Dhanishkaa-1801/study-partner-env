@@ -67,16 +67,16 @@ def grade(
     # Did the agent actually schedule Trees AND did its score improve?
     trees_scheduled = "Trees" in scheduled_topics
     trees_score_end = topic_scores.get("Trees", 0.0)
-    trees_improved  = trees_score_end > 0.3   # started at 0.3
+    trees_improved  = trees_score_end > 0.3  
 
     if trees_scheduled and trees_improved:
         critical_topic_coverage = 1.0
     elif trees_scheduled and not trees_improved:
-        critical_topic_coverage = 0.6   # scheduled but no improvement (odd)
+        critical_topic_coverage = 0.6   
     elif not trees_scheduled and trees_score_end >= MASTERY_THRESHOLD:
-        critical_topic_coverage = 0.4   # somehow mastered without scheduling
+        critical_topic_coverage = 0.4  
     else:
-        critical_topic_coverage = 0.0   # completely missed
+        critical_topic_coverage = 0.0   
 
     # ── Axis 2: Personality fit — anxious needs notes/video first (weight 0.30) ─
     # Check history: did agent ever recommend Trees with notes or video?

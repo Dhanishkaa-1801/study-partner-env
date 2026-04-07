@@ -49,35 +49,24 @@ client = OpenAI(base_url=API_BASE_URL, api_key=API_KEY)
 # ─────────────────────────────────────────────
 
 def log_start(task_id: str):
-    """Emit [START] log — once per task, before any steps."""
-    print(json.dumps({
-        "tag":      "[START]",
-        "task_id":  task_id,
-        "model":    MODEL_NAME,
-        "env_url":  ENV_URL,
-    }), flush=True)
+    print(f"[START] task={task_id} env=study-partner model={MODEL_NAME}", flush=True)
 
 
 def log_step(step: int, action: dict, reward: float, done: bool):
-    """Emit [STEP] log — once per environment step."""
-    print(json.dumps({
-        "tag":    "[STEP]",
-        "step":   step,
-        "action": action,
-        "reward": round(reward, 4),
-        "done":   done,
-    }), flush=True)
+    action_str = json.dumps(action, separators=(",", ":"))  # compact JSON
+    print(
+        f"[STEP] step={step} action={action_str} reward={reward:.2f} done={str(done).lower()} error=null",
+        flush=True,
+    )
 
 
-def log_end(task_id: str, score: float, total_steps: int):
-    """Emit [END] log — once per task, after episode finishes."""
-    print(json.dumps({
-        "tag":         "[END]",
-        "task_id":     task_id,
-        "score":       round(score, 4),
-        "total_steps": total_steps,
-    }), flush=True)
-
+def log_end(task_id: str, score: float, total_steps: int, rewards: list):
+    rewards_str = ",".join(f"{r:.2f}" for r in rewards)
+    success = "true" if score > 0 else "false"
+    print(
+        f"[END] success={success} steps={total_steps} score={score:.2f} rewards={rewards_str}",
+        flush=True,
+    )
 
 # ─────────────────────────────────────────────
 # Prompts
@@ -157,18 +146,15 @@ def get_agent_action(obs: dict) -> dict:
 
             raw = response.choices[0].message.content.strip()
 
-            # Strip markdown code fences if model adds them
             raw = raw.replace("```json", "").replace("```", "").strip()
 
             action = json.loads(raw)
 
-            # Validate required fields exist
             required = ["recommended_topic", "assigned_slot", "resource_type", "urgency"]
             for field in required:
                 if field not in action:
                     raise ValueError(f"Missing field: {field}")
 
-            # Validate values are legal
             if action["recommended_topic"] not in obs["weak_topics"]:
                 action["recommended_topic"] = obs["weak_topics"][0]
 
@@ -239,7 +225,6 @@ def call_env(method: str, path: str, **kwargs) -> dict:
 def run_task(task_id: str) -> float:
     """Run one full episode for a task. Returns final score."""
 
-    # Reset environment and emit [START]
     obs = call_env("POST", f"/reset?task_id={task_id}")
     log_start(task_id)
 
@@ -258,13 +243,11 @@ def run_task(task_id: str) -> float:
 
         episode_rewards.append(reward)
 
-        # Mandatory structured step log
         log_step(step_num, action, reward, done)
 
     final_score = sum(episode_rewards) / len(episode_rewards) if episode_rewards else 0.0
 
-    # Mandatory structured end log
-    log_end(task_id, final_score, step_num)
+    log_end(task_id, final_score, step_num, episode_rewards)
 
     return final_score
 
@@ -274,7 +257,6 @@ def run_task(task_id: str) -> float:
 # ─────────────────────────────────────────────
 
 def main():
-    # Quick health check
     try:
         call_env("GET", "/health")
     except Exception:
@@ -289,14 +271,12 @@ def main():
             log_end(task_id, 0.0, 0)
             scores[task_id] = 0.0
 
-    # Final summary (plain print is fine here — outside task scope)
     avg = sum(scores.values()) / len(scores)
     print(json.dumps({
         "tag":    "[SUMMARY]",
         "scores": {k: round(v, 4) for k, v in scores.items()},
         "avg":    round(avg, 4),
     }), flush=True)
-
 
 if __name__ == "__main__":
     main()

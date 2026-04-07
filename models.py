@@ -59,7 +59,7 @@ class Resource(BaseModel):
 
 class Disruption(BaseModel):
     """A mid-episode event that changes the student's situation."""
-    type: str           # "missed_session" | "mock_test_added" | "topic_mastered"
+    type: str           
     description: str
     affected_slots: List[str] = Field(default_factory=list)
 
@@ -98,31 +98,25 @@ class StudyObservation(BaseModel):
     Person B's inference.py reads these fields to build the
     prompt sent to the LLM.
     """
-    # Task info
     task_id: str
     step: int
     max_steps: int
     done: bool = False
 
-    # Student profile
     student_id: str
     personality: Personality
 
-    # Academic state
-    weak_topics: List[str]              # topics with score < 0.6
-    topic_scores: Dict[str, float]      # topic → 0.0 to 1.0
-    retention_scores: Dict[str, float]  # topic → decayed retention 0.0–1.0
+    weak_topics: List[str]              
+    topic_scores: Dict[str, float]      
+    retention_scores: Dict[str, float]  
 
-    # Schedule
-    available_slots: List[str]          # e.g. ["Mon 9am", "Tue 2pm"]
-    exam_date: str                      # ISO date string "2024-03-15"
+    available_slots: List[str]          
+    exam_date: str                      
     days_remaining: int
 
-    # Feedback from previous step
     last_action_feedback: str = ""
     last_reward: float = 0.0
 
-    # Mid-episode disruption (None if no disruption this step)
     disruption: Optional[Disruption] = None
 
 
@@ -148,6 +142,7 @@ class RewardBreakdown(BaseModel):
     repetition_penalty:      float = 0.0
     mastered_penalty:        float = 0.0
     retention_decay_penalty: float = 0.0
+
 # ─────────────────────────────────────────────────────────────
 # Step result — what step() returns
 # ─────────────────────────────────────────────────────────────
@@ -162,11 +157,6 @@ class StepResult(BaseModel):
     reward: float = Field(0.0, ge=0.0, le=1.0)
     done: bool
     info: Dict[str, Any] = Field(default_factory=dict)
-    # info always contains:
-    #   "reward_breakdown": RewardBreakdown.model_dump()
-    #   "task_id": str
-    #   "step": int
-
 
 # ─────────────────────────────────────────────────────────────
 # Task grade result — returned by grader at episode end
@@ -178,7 +168,7 @@ class GradeResult(BaseModel):
     Returned by each task's grade() function.
     """
     task_id: str
-    score: float = Field(0.0, ge=0.0, le=1.0)    # overall 0.0–1.0
-    passed: bool                                   # score >= pass_threshold
+    score: float = Field(0.0, ge=0.0, le=1.0)   
+    passed: bool                                   
     breakdown: Dict[str, float] = Field(default_factory=dict)
     feedback: str = ""

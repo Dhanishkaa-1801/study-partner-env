@@ -10,9 +10,6 @@ import uvicorn
 
 from models import StudyAction, StudyObservation, StepResult
 
-# We import lazily so the server starts even if environment.py
-# is still being written by Person A — swap the stub below once
-# Person A's environment.py is ready.
 try:
     from environment import StudyEnv
     ENV_READY = True
@@ -24,11 +21,7 @@ app = FastAPI(
     description="OpenEnv environment — personalized study planning RL agent",
     version="1.0.0",
 )
-
-# One env instance per named session
-# Fine for hackathon scale (single-agent evaluation)
 envs: Dict[str, "StudyEnv"] = {}
-
 
 # ─────────────────────────────────────────────
 # Health + meta

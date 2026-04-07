@@ -35,7 +35,6 @@ TASK_ID          = "task_2"
 PASS_THRESHOLD   = 0.55
 MASTERY_THRESHOLD = 0.6
 
-# Starting scores for Arjun — used to check difficulty progression
 ARJUN_INITIAL_SCORES = {
     "Arrays"            : 0.3,
     "Trees"             : 0.2,

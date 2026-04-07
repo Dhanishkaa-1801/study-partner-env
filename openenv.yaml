@@ -141,6 +141,6 @@ huggingface:
   sdk: docker
 
 baseline_scores:
-  task_1: 0.8333
-  task_2: 0.8857
-  task_3: 0.9167
+  task_1: 0.8667
+  task_2: 0.8
+  task_3: 0.9273

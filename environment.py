@@ -50,14 +50,14 @@ RESOURCES_PATH= os.path.join(DATA_DIR, "resources.json")
 
 TASK_CONFIGS: Dict[str, Dict[str, Any]] = {
     "task_1": {
-        "student_id"         : "s002",          # Priya — anxious, 3 days
+        "student_id"         : "s002",          
         "max_steps"          : 5,
         "critical_topics"    : ["Trees"],
-        "disruption_schedule": {},               # no disruptions on easy task
+        "disruption_schedule": {},               
         "description"        : "Single topic recommendation. Student has 1 weak focus topic (Trees), 3 days to exam. Agent must pick right problem + slot.",
     },
     "task_2": {
-        "student_id"         : "s001",           # Arjun — procrastinator, 7 days
+        "student_id"         : "s001",           
         "max_steps"          : 10,
         "critical_topics"    : ["Arrays", "Trees", "Dynamic Programming", "System Design"],
         "disruption_schedule": {
@@ -70,7 +70,7 @@ TASK_CONFIGS: Dict[str, Dict[str, Any]] = {
         "description"        : "Weekly study plan. 4 weak topics, 7 days, 2 hrs/day. Agent must cover all weak topics with no overloading.",
     },
     "task_3": {
-        "student_id"         : "s003",           # Kiran — consistent, 14 days
+        "student_id"         : "s003",           
         "max_steps"          : 15,
         "critical_topics"    : ["Dynamic Programming", "Graphs", "System Design"],
         "disruption_schedule": {
@@ -99,7 +99,7 @@ TASK_CONFIGS: Dict[str, Dict[str, Any]] = {
 # ---------------------------------------------------------------------------
 
 DECAY_PER_STEP = 0.10   # 10% retention loss per step for unstudied topics
-MASTERY_THRESHOLD = 0.6  # topics below this are "weak"
+MASTERY_THRESHOLD = 0.6  # topics below this are weak
 
 
 def apply_forgetting_curve(
@@ -169,9 +169,9 @@ class StudyEnv:
         # Runtime state (populated by reset())
         self._obs: Optional[StudyObservation] = None
         self._step_count    = 0
-        self._scheduled: Dict[str, str] = {}          # slot → topic
-        self._topic_studied_steps: Dict[str, int] = {} # topic → last step studied
-        self._history: List[str] = []                  # recommended topics log
+        self._scheduled: Dict[str, str] = {}          
+        self._topic_studied_steps: Dict[str, int] = {} 
+        self._history: List[str] = []                  
         self._episode_rewards: List[float] = []
         self._done = False
 
@@ -184,9 +184,8 @@ class StudyEnv:
         cfg = self.task_cfg
         student_data = self._get_student(cfg["student_id"])
 
-        # Deep copy scores so mutations don't bleed between episodes
         topic_scores     = deepcopy(student_data["topic_scores"])
-        retention_scores = deepcopy(student_data["topic_scores"])  # starts equal to mastery
+        retention_scores = deepcopy(student_data["topic_scores"])  
         available_slots  = deepcopy(student_data["available_slots"])
 
         self._step_count    = 0
@@ -196,7 +195,6 @@ class StudyEnv:
         self._episode_rewards = []
         self._done          = False
 
-        # Internal mutable state (not exposed directly — only via observation)
         self._topic_scores     = topic_scores
         self._retention_scores = retention_scores
         self._available_slots  = available_slots
@@ -253,7 +251,6 @@ class StudyEnv:
         # ── 1. Validate action ──────────────────────────────────────────────
         validation_error = self._validate_action(action)
         if validation_error:
-            # Invalid action: 0.0 reward + -0.1 penalty, no state update
             reward_bd.total = 0.0
             info = {
                 "reward_breakdown": reward_bd.model_dump(),
@@ -388,17 +385,12 @@ class StudyEnv:
         slot  = action.assigned_slot
         score = self._topic_scores.get(topic, 0.5)
 
-        # ── Positive signals ─────────────────────────────────────────────
-        # +0.4 weak topic targeted
         if score < MASTERY_THRESHOLD:
             bd.topic_match = 0.4
         else:
-            bd.mastered_penalty = -0.2   # already mastered
+            bd.mastered_penalty = -0.2   
 
-        # +0.3 difficulty appropriate
         ideal_diff   = pick_difficulty(score)
-        # We can't know exactly which problem will be picked yet,
-        # so we reward if the resource_type makes sense for difficulty
         if ideal_diff == Difficulty.EASY and action.resource_type in (ResourceType.NOTES, ResourceType.VIDEO):
             bd.difficulty_match = 0.3
         elif ideal_diff == Difficulty.MEDIUM and action.resource_type in (ResourceType.PROBLEM, ResourceType.NOTES):
@@ -406,12 +398,10 @@ class StudyEnv:
         elif ideal_diff == Difficulty.HARD and action.resource_type in (ResourceType.PROBLEM, ResourceType.MOCK_TEST):
             bd.difficulty_match = 0.3
         else:
-            bd.difficulty_match = 0.1   # partial credit — not ideal but not zero
+            bd.difficulty_match = 0.1   
 
-        # +0.2 slot valid (free + before exam) — slot already confirmed free by validation
         bd.slot_valid = 0.2
 
-        # +0.1 pacing on track
         total_topics  = len(self._topic_scores)
         covered       = len(set(self._history))
         expected_pct  = 1.0 - (self._days_remaining / max(1, self._days_remaining + self._step_count))
@@ -419,21 +409,16 @@ class StudyEnv:
         if actual_pct >= expected_pct * 0.8:
             bd.pacing_score = 0.1
 
-        # ── Penalties ────────────────────────────────────────────────────
-        # -0.2 overload: more than 2 sessions already booked today
-        day_of_slot   = slot.split(" ")[0]   # e.g. "Mon" from "Mon 9am"
+        day_of_slot   = slot.split(" ")[0]   
         sessions_today = sum(
             1 for s in self._scheduled if s.split(" ")[0] == day_of_slot
         )
         if sessions_today >= 2:
             bd.overload_penalty = -0.2
 
-        # -0.1 repetition: same topic recommended twice in a row
         if self._history and self._history[-1] == topic:
             bd.repetition_penalty = -0.1
 
-        # ── Personality bonus (not a RewardBreakdown field — tracked separately) ──
-        # +0.1 if action fits personality
         personality_bonus = 0.0
         if self._personality == Personality.PROCRASTINATOR and action.urgency == Urgency.TODAY:
             personality_bonus = 0.1
@@ -442,11 +427,9 @@ class StudyEnv:
         elif self._personality == Personality.CONSISTENT and action.urgency == Urgency.THIS_WEEK:
             personality_bonus = 0.1
 
-        # ── Forgetting curve penalty (not a RewardBreakdown field — tracked separately) ──
         retention = self._retention_scores.get(topic, 1.0)
         retention_penalty = -0.1 if retention < 0.5 else 0.0
 
-        # Compute total using only fields that exist in teammate's RewardBreakdown
         raw = (
             bd.topic_match
             + bd.difficulty_match
@@ -466,21 +449,16 @@ class StudyEnv:
         topic = action.recommended_topic
         slot  = action.assigned_slot
 
-        # Remove slot from available pool
         self._available_slots.remove(slot)
 
-        # Record schedule
         self._scheduled[slot] = topic
 
-        # Improve topic score (studying helps, caps at 1.0)
         self._topic_scores[topic] = round(
             min(1.0, self._topic_scores.get(topic, 0.0) + 0.12), 4
         )
 
-        # Track topic studied this step
         self._topic_studied_steps[topic] = self._step_count
 
-        # Add to history
         self._history.append(topic)
 
     def _get_disruption(self, step: int) -> Optional[Disruption]:
@@ -493,19 +471,16 @@ class StudyEnv:
     def _apply_disruption(self, disruption: Disruption) -> None:
         """Mutate state based on disruption type."""
         if disruption.type == "missed_session":
-            # Remove affected slots from available pool
             for slot in disruption.affected_slots:
                 if slot in self._available_slots:
                     self._available_slots.remove(slot)
 
         elif disruption.type == "mock_test_added":
-            # Block the affected slot (reserved for mock test)
             for slot in disruption.affected_slots:
                 if slot in self._available_slots:
                     self._available_slots.remove(slot)
 
         elif disruption.type == "topic_mastered":
-            # Student reports a topic feels okay — boost its score
             for topic in self._topic_scores:
                 if topic in disruption.description:
                     self._topic_scores[topic] = max(
