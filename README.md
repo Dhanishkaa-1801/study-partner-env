@@ -272,9 +272,9 @@ Evaluated using `llama-3.1-8b-instant` via Groq (Compatible API)
 | Task | Difficulty | Score | Passed |
 |---|---|---|---|
 | task_1 | Easy | **0.8667** | ✅ (threshold: 0.60) |
-| task_2 | Medium | **0.7714** | ✅ (threshold: 0.55) |
-| task_3 | Hard | **0.9364** | ✅ (threshold: 0.45) |
-| **Average** | | **0.8582** | ✅ |
+| task_2 | Medium | **0.8** | ✅ (threshold: 0.55) |
+| task_3 | Hard | **0.9273** | ✅ (threshold: 0.45) |
+| **Average** | | **0.8646** | ✅ |
 
 ---
 
