@@ -42,9 +42,10 @@ if not API_KEY:
     print("WARNING: No API key found, using fallback policy")
     client = None
 else:
-    client = OpenAI(base_url=API_BASE_URL, api_key=API_KEY)
-
-client = OpenAI(base_url=API_BASE_URL, api_key=API_KEY)
+    try:
+        client = OpenAI(base_url=API_BASE_URL, api_key=API_KEY)
+    except Exception:
+        client = None
 
 def wait_for_env():
     for _ in range(20):
@@ -237,13 +238,22 @@ def call_env(method: str, path: str, **kwargs) -> dict:
 
     except Exception as e:
         print(f"ENV CALL FAILED: {e}")
-        raise
+        return {}
 
 
 def run_task(task_id: str) -> float:
     """Run one full episode for a task. Returns final score."""
 
-    obs = call_env("POST", f"/reset?task_id={task_id}")
+    try:
+        obs = call_env("POST", f"/reset?task_id={task_id}")
+    except Exception as e:      
+        log_end(task_id, 0.0, 0, [])
+        return 0.0
+    
+    if not obs:
+        log_end(task_id, 0.0, 0, [])
+        return 0.0
+
     log_start(task_id)
 
     episode_rewards = []
@@ -260,8 +270,8 @@ def run_task(task_id: str) -> float:
             log_step(step_num, action, 0.0, True, str(e))
             break
 
-        obs    = result["observation"]
-        reward = result["reward"]
+        obs = result.get("observation", {})
+        reward = result.get("reward", 0.0)
         done   = result.get("done", False)
 
         episode_rewards.append(reward)
