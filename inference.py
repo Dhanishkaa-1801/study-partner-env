@@ -259,8 +259,11 @@ def run_task(task_id: str) -> float:
     episode_rewards = []
     step_num        = 0
 
-    while not obs.get("done", False) and obs.get("available_slots"):
+    while isinstance(obs, dict) and not obs.get("done", False) and obs.get("available_slots"):
         step_num += 1
+
+        if not obs:
+            break
 
         action = get_agent_action(obs)
 
@@ -270,9 +273,13 @@ def run_task(task_id: str) -> float:
             log_step(step_num, action, 0.0, True, str(e))
             break
 
-        obs = result.get("observation", {})
+        if not result:
+            log_step(step_num, action, 0.0, True, "empty_response")
+            break
+
+        obs    = result.get("observation", {})
         reward = result.get("reward", 0.0)
-        done   = result.get("done", False)
+        done   = result.get("done", True)
 
         episode_rewards.append(reward)
 
