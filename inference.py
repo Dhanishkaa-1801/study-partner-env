@@ -27,7 +27,7 @@ load_dotenv()
 
 API_BASE_URL = os.getenv("API_BASE_URL", "https://api.groq.com/openai/v1")
 MODEL_NAME   = os.getenv("MODEL_NAME", "llama-3.1-8b-instant")
-ENV_URL      = os.getenv("ENV_URL", "https://dhani1801-study-partner-env.hf.space")
+ENV_URL = os.getenv("ENV_URL", "http://localhost:7860")
 
 TEMPERATURE  = 0.2
 MAX_TOKENS   = 300
@@ -44,25 +44,38 @@ if not API_KEY:
 
 client = OpenAI(base_url=API_BASE_URL, api_key=API_KEY)
 
+def wait_for_env():
+    for _ in range(15):
+        try:
+            r = httpx.get(f"{ENV_URL}/health", timeout=5)
+            if r.status_code == 200:
+                return
+        except:
+            time.sleep(2)
+    print("ERROR: Env not ready")
+    sys.exit(1)
+
 # ─────────────────────────────────────────────
 # Structured logging — mandatory format
 # ─────────────────────────────────────────────
 
 def log_start(task_id: str):
-    print(f"[START] task={task_id} env=study-partner model={MODEL_NAME}", flush=True)
+    print(f"[START] task={task_id} env=adaptive-study-partner model={MODEL_NAME}")
 
 
-def log_step(step: int, action: dict, reward: float, done: bool):
-    action_str = json.dumps(action, separators=(",", ":"))  # compact JSON
+def log_step(step: int, action: dict, reward: float, done: bool, error=None):
+    action_str = json.dumps(action, separators=(",", ":"))
+    error_val = error if error else "null"
+
     print(
-        f"[STEP] step={step} action={action_str} reward={reward:.2f} done={str(done).lower()} error=null",
+        f"[STEP] step={step} action={action_str} reward={reward:.2f} done={str(done).lower()} error={error_val}",
         flush=True,
     )
 
 
 def log_end(task_id: str, score: float, total_steps: int, rewards: list):
     rewards_str = ",".join(f"{r:.2f}" for r in rewards)
-    success = "true" if score > 0 else "false"
+    success = "true" if score >= 0.4 else "false"
     print(
         f"[END] success={success} steps={total_steps} score={score:.2f} rewards={rewards_str}",
         flush=True,
@@ -207,18 +220,18 @@ def get_fallback_action(obs: dict) -> dict:
 # ─────────────────────────────────────────────
 
 def call_env(method: str, path: str, **kwargs) -> dict:
-    """Make an HTTP call to the environment server."""
     url = f"{ENV_URL}{path}"
     try:
         if method == "GET":
             r = httpx.get(url, timeout=30)
         elif method == "POST":
             r = httpx.post(url, timeout=30, **kwargs)
+
         r.raise_for_status()
         return r.json()
-    except httpx.HTTPStatusError as e:
-        raise
-    except httpx.ConnectError:
+
+    except Exception as e:
+        print(f"ENV CALL FAILED: {e}")
         raise
 
 
@@ -235,7 +248,12 @@ def run_task(task_id: str) -> float:
         step_num += 1
 
         action = get_agent_action(obs)
-        result = call_env("POST", "/step", json=action)
+
+        try:
+            result = call_env("POST", "/step", json=action)
+        except Exception as e:
+            log_step(step_num, action, 0.0, True, str(e))
+            break
 
         obs    = result["observation"]
         reward = result["reward"]
@@ -243,9 +261,11 @@ def run_task(task_id: str) -> float:
 
         episode_rewards.append(reward)
 
-        log_step(step_num, action, reward, done)
+        error = result.get("info", {}).get("error")
+        log_step(step_num, action, reward, done, error)
 
     final_score = sum(episode_rewards) / len(episode_rewards) if episode_rewards else 0.0
+    final_score = max(0.0, min(final_score, 1.0))
 
     log_end(task_id, final_score, step_num, episode_rewards)
 
@@ -255,20 +275,26 @@ def run_task(task_id: str) -> float:
 # ─────────────────────────────────────────────
 # Main
 # ─────────────────────────────────────────────
+def wait_for_env():
+    for _ in range(15):  # tries for ~30 seconds
+        try:
+            r = httpx.get(f"{ENV_URL}/health", timeout=5)
+            if r.status_code == 200:
+                return
+        except:
+            time.sleep(2)
+    print(json.dumps({"tag": "[ERROR]", "message": "Environment not ready"}))
+    sys.exit(1)
 
 def main():
-    try:
-        call_env("GET", "/health")
-    except Exception:
-        print(json.dumps({"tag": "[ERROR]", "message": f"Cannot reach environment server at {ENV_URL}"}))
-        sys.exit(1)
+    wait_for_env()
 
     scores = {}
     for task_id in ["task_1", "task_2", "task_3"]:
         try:
             scores[task_id] = run_task(task_id)
         except Exception as e:
-            log_end(task_id, 0.0, 0)
+            log_end(task_id, 0.0, 0, [])  
             scores[task_id] = 0.0
 
     avg = sum(scores.values()) / len(scores)
@@ -277,6 +303,7 @@ def main():
         "scores": {k: round(v, 4) for k, v in scores.items()},
         "avg":    round(avg, 4),
     }), flush=True)
+
 
 if __name__ == "__main__":
     main()
