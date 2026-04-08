@@ -8,7 +8,7 @@ Required environment variables:
     API_BASE_URL   LLM endpoint  e.g. https://api.groq.com/openai/v1
     MODEL_NAME     Model id      e.g. llama-3.1-8b-instant
     ROQ_API_KEY       Your Hugging Face / API key
-    ENV_URL = os.getenv("ENV_URL", "http://127.0.0.1:7860")
+    ENV_URL = os.getenv("ENV_URL", "https://dhani1801-study-partner-env.hf.space")
 """
 
 import os
@@ -27,7 +27,7 @@ load_dotenv()
 
 API_BASE_URL = os.getenv("API_BASE_URL", "https://api.groq.com/openai/v1")
 MODEL_NAME   = os.getenv("MODEL_NAME", "llama-3.1-8b-instant")
-ENV_URL = os.getenv("ENV_URL", "http://127.0.0.1:7860")
+ENV_URL = os.getenv("ENV_URL", "https://dhani1801-study-partner-env.hf.space")
 
 TEMPERATURE  = 0.2
 MAX_TOKENS   = 300
@@ -48,16 +48,16 @@ else:
         client = None
 
 def wait_for_env():
-    for _ in range(20):
+    for _ in range(10):  # shorter wait
         try:
             r = httpx.get(f"{ENV_URL}/health", timeout=5)
             if r.status_code == 200:
-                return True
+                return
         except:
-            time.sleep(2)
+            pass
+        time.sleep(2)
 
     print("WARNING: Env not ready, continuing anyway...")
-    return False
 
 # ─────────────────────────────────────────────
 # Structured logging — mandatory format
@@ -146,11 +146,11 @@ Recommend the best study action right now."""
 # Agent logic
 # ─────────────────────────────────────────────
 
-if client is None:
-    return get_fallback_action(obs)
 def get_agent_action(obs: dict) -> dict:
     """Call the LLM and parse its action. Returns a valid action dict."""
 
+    if client is None:
+        return get_fallback_action(obs)
     for attempt in range(MAX_RETRIES):
         try:
             response = client.chat.completions.create(
@@ -302,13 +302,11 @@ def main():
     try:
         wait_for_env()
 
-        scores = {}
         for task_id in ["task_1", "task_2", "task_3"]:
             try:
-                scores[task_id] = run_task(task_id)
-            except Exception as e:
+                run_task(task_id)
+            except Exception:
                 log_end(task_id, 0.0, 0, [])
-                scores[task_id] = 0.0
 
     except Exception as e:
         print(f"FATAL ERROR: {e}")
