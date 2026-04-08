@@ -297,13 +297,5 @@ def main():
             log_end(task_id, 0.0, 0, [])  
             scores[task_id] = 0.0
 
-    avg = sum(scores.values()) / len(scores)
-    print(json.dumps({
-        "tag":    "[SUMMARY]",
-        "scores": {k: round(v, 4) for k, v in scores.items()},
-        "avg":    round(avg, 4),
-    }), flush=True)
-
-
 if __name__ == "__main__":
     main()
