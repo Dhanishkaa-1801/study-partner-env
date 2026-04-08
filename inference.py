@@ -5,9 +5,9 @@ Usage:
     python inference.py
 
 Required environment variables:
-    API_BASE_URL   LLM endpoint  e.g. https://api.groq.com/openai/v1
-    MODEL_NAME     Model id      e.g. llama-3.1-8b-instant
-    ROQ_API_KEY       Your Hugging Face / API key
+    API_BASE_URL   LLM endpoint  e.g. https://router.huggingface.co/v1
+    MODEL_NAME     Model id      e.g. MiniMaxAI/MiniMax-M2.1
+    API_KEY       Your Hugging Face / API key
     ENV_URL = os.getenv("ENV_URL", "https://dhani1801-study-partner-env.hf.space")
 """
 
@@ -25,18 +25,18 @@ load_dotenv()
 # Config
 # ─────────────────────────────────────────────
 
-API_BASE_URL = os.getenv("API_BASE_URL", "https://api.groq.com/openai/v1")
-MODEL_NAME   = os.getenv("MODEL_NAME", "llama-3.1-8b-instant")
-ENV_URL = os.getenv("ENV_URL", "https://dhani1801-study-partner-env.hf.space")
 
 TEMPERATURE  = 0.2
 MAX_TOKENS   = 300
 MAX_RETRIES  = 3
 
-HF_TOKEN   = os.getenv("HF_TOKEN")
-GROQ_TOKEN = os.getenv("GROQ_API_KEY")
-
-API_KEY = GROQ_TOKEN or HF_TOKEN
+API_BASE_URL = os.environ.get("API_BASE_URL", "https://router.huggingface.co/v1")
+MODEL_NAME   = os.environ.get("MODEL_NAME", "MiniMaxAI/MiniMax-M2.1")
+API_KEY      = os.environ.get("API_KEY")
+ENV_URL = os.environ.get(
+    "ENV_URL",
+    "https://dhani1801-study-partner-env.hf.space"
+)
 
 if not API_KEY:
     print("WARNING: No API key found, using fallback policy")
@@ -48,7 +48,7 @@ else:
         client = None
 
 def wait_for_env():
-    for _ in range(10):  # shorter wait
+    for _ in range(30):  # ~60 sec
         try:
             r = httpx.get(f"{ENV_URL}/health", timeout=5)
             if r.status_code == 200:
@@ -57,14 +57,14 @@ def wait_for_env():
             pass
         time.sleep(2)
 
-    print("WARNING: Env not ready, continuing anyway...")
+    print("WARNING: Env not ready, continuing anyway...", flush=True)
 
 # ─────────────────────────────────────────────
 # Structured logging — mandatory format
 # ─────────────────────────────────────────────
 
 def log_start(task_id: str):
-    print(f"[START] task={task_id} env=adaptive-study-partner model={MODEL_NAME}")
+    print(f"[START] task={task_id} env=adaptive-study-partner model={MODEL_NAME}", flush=True)
 
 
 def log_step(step: int, action: dict, reward: float, done: bool, error=None):
@@ -72,8 +72,8 @@ def log_step(step: int, action: dict, reward: float, done: bool, error=None):
     error_val = error if error else "null"
 
     print(
-        f"[STEP] step={step} action={action_str} reward={reward:.2f} done={str(done).lower()} error={error_val}",
-        flush=True,
+    f"[STEP] step={step} action={action_str} reward={reward:.2f} done={str(done).lower()} error={error_val}",
+    flush=True,
     )
 
 
@@ -81,8 +81,8 @@ def log_end(task_id: str, score: float, total_steps: int, rewards: list):
     rewards_str = ",".join(f"{r:.2f}" for r in rewards)
     success = "true" if score >= 0.4 else "false"
     print(
-        f"[END] success={success} steps={total_steps} score={score:.2f} rewards={rewards_str}",
-        flush=True,
+    f"[END] success={success} steps={total_steps} score={score:.2f} rewards={rewards_str}",
+    flush=True,
     )
 
 # ─────────────────────────────────────────────
@@ -237,8 +237,8 @@ def call_env(method: str, path: str, **kwargs) -> dict:
         return r.json()
 
     except Exception as e:
-        print(f"ENV CALL FAILED: {e}")
-        return {}
+        print(f"ENV CALL FAILED: {e}", flush=True)
+        raise
 
 
 def run_task(task_id: str) -> float:
@@ -309,10 +309,10 @@ def main():
                 log_end(task_id, 0.0, 0, [])
 
     except Exception as e:
-        print(f"FATAL ERROR: {e}")
+        print(f"FATAL ERROR: {e}", flush=True)
 
 if __name__ == "__main__":
     try:
         main()
     except Exception as e:
-        print(f"UNCAUGHT ERROR: {e}")
+        print(f"UNCAUGHT ERROR: {e}", flush=True)
