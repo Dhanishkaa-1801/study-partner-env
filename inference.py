@@ -39,8 +39,10 @@ GROQ_TOKEN = os.getenv("GROQ_API_KEY")
 API_KEY = GROQ_TOKEN or HF_TOKEN
 
 if not API_KEY:
-    print("ERROR: No API key set (GROQ_API_KEY or HF_TOKEN)")
-    sys.exit(1)
+    print("WARNING: No API key found, using fallback policy")
+    client = None
+else:
+    client = OpenAI(base_url=API_BASE_URL, api_key=API_KEY)
 
 client = OpenAI(base_url=API_BASE_URL, api_key=API_KEY)
 
@@ -143,6 +145,8 @@ Recommend the best study action right now."""
 # Agent logic
 # ─────────────────────────────────────────────
 
+if client is None:
+    return get_fallback_action(obs)
 def get_agent_action(obs: dict) -> dict:
     """Call the LLM and parse its action. Returns a valid action dict."""
 
@@ -293,4 +297,7 @@ def main():
         print(f"FATAL ERROR: {e}")
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        print(f"UNCAUGHT ERROR: {e}")
