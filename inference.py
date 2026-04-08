@@ -8,7 +8,7 @@ Required environment variables:
     API_BASE_URL   LLM endpoint  e.g. https://api.groq.com/openai/v1
     MODEL_NAME     Model id      e.g. llama-3.1-8b-instant
     ROQ_API_KEY       Your Hugging Face / API key
-    ENV_URL        Environment server (default: http://localhost:8000) or https://dhani1801-study-partner-env.hf.space
+    ENV_URL = os.getenv("ENV_URL", "http://127.0.0.1:7860")
 """
 
 import os
@@ -27,7 +27,7 @@ load_dotenv()
 
 API_BASE_URL = os.getenv("API_BASE_URL", "https://api.groq.com/openai/v1")
 MODEL_NAME   = os.getenv("MODEL_NAME", "llama-3.1-8b-instant")
-ENV_URL = os.getenv("ENV_URL", "http://localhost:7860")
+ENV_URL = os.getenv("ENV_URL", "http://127.0.0.1:7860")
 
 TEMPERATURE  = 0.2
 MAX_TOKENS   = 300
@@ -45,15 +45,16 @@ if not API_KEY:
 client = OpenAI(base_url=API_BASE_URL, api_key=API_KEY)
 
 def wait_for_env():
-    for _ in range(15):
+    for _ in range(20):  # wait longer (~40 sec)
         try:
             r = httpx.get(f"{ENV_URL}/health", timeout=5)
             if r.status_code == 200:
-                return
+                return True
         except:
             time.sleep(2)
-    print("ERROR: Env not ready")
-    sys.exit(1)
+
+    print("WARNING: Env not ready, continuing anyway...")
+    return False
 
 # ─────────────────────────────────────────────
 # Structured logging — mandatory format
@@ -287,15 +288,19 @@ def wait_for_env():
     sys.exit(1)
 
 def main():
-    wait_for_env()
+    try:
+        wait_for_env()
 
-    scores = {}
-    for task_id in ["task_1", "task_2", "task_3"]:
-        try:
-            scores[task_id] = run_task(task_id)
-        except Exception as e:
-            log_end(task_id, 0.0, 0, [])  
-            scores[task_id] = 0.0
+        scores = {}
+        for task_id in ["task_1", "task_2", "task_3"]:
+            try:
+                scores[task_id] = run_task(task_id)
+            except Exception as e:
+                log_end(task_id, 0.0, 0, [])
+                scores[task_id] = 0.0
+
+    except Exception as e:
+        print(f"FATAL ERROR: {e}")
 
 if __name__ == "__main__":
     main()
