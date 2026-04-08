@@ -45,7 +45,7 @@ if not API_KEY:
 client = OpenAI(base_url=API_BASE_URL, api_key=API_KEY)
 
 def wait_for_env():
-    for _ in range(20):  # wait longer (~40 sec)
+    for _ in range(20):
         try:
             r = httpx.get(f"{ENV_URL}/health", timeout=5)
             if r.status_code == 200:
@@ -276,16 +276,6 @@ def run_task(task_id: str) -> float:
 # ─────────────────────────────────────────────
 # Main
 # ─────────────────────────────────────────────
-def wait_for_env():
-    for _ in range(15):  # tries for ~30 seconds
-        try:
-            r = httpx.get(f"{ENV_URL}/health", timeout=5)
-            if r.status_code == 200:
-                return
-        except:
-            time.sleep(2)
-    print(json.dumps({"tag": "[ERROR]", "message": "Environment not ready"}))
-    sys.exit(1)
 
 def main():
     try:
